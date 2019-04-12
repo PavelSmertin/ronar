@@ -2,7 +2,7 @@ import asyncore, socket, time
 
 class client(asyncore.dispatcher):
 
-    secs = 0
+    secs = 1
     def __init__(self, host):
         self.host = host
         asyncore.dispatcher.__init__(self)
@@ -18,9 +18,8 @@ class client(asyncore.dispatcher):
 
     def handle_write(self):
         print(self.secs)
-        self.secs = self.secs + 1
         time.sleep(self.secs)
-        self.send('6E3E0053"RO-TEM"4894L0#355911044259579[1210 18 00 28 03EB92151D1D FEB6]_04:24:05,12-13-2017'.encode('utf8'))
+        self.send(bytes.fromhex('11 61 3a 00 2b 16 11 11 00 00 00 00 12 34 56 78 9a bc de f0 12 34 56 78 9a bc de f0 00 00 24 00 13 01 15 02 20 19 3b 0e 64 00 31 01 00 00 00 00 00 00 00 00 00 00 7f 00 00 00 00 00 ec 5b 90 99'))
 
     def handle_read(self):
         print (' ', self.recv(1024))

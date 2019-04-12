@@ -8,7 +8,9 @@ import socketserver
 from datetime import datetime
 import time
 from enum import Enum
-from ronarlistener.message import Message, Protocol
+from ronarlistener.incoming import Incoming
+from ronarlistener.rabbit_consumer import RabbitConsumer
+
 
 log = logging.getLogger(__name__)
 TIME_INTERVAL = 40
@@ -20,24 +22,28 @@ class AlarmNotificationHandler(socketserver.StreamRequestHandler):
 
     def handle(self):
 
+        #self.request.sendall(b"test")
+        #amqp_url = 'amqp://localhost:5672/%2F'
+        #consumer = RabbitConsumer(amqp_url)
+        #consumer.run()
+
         try: 
             while True:
-                line = self.request.recv(1024).strip().decode('utf8')
+                line = self.request.recv(1024)
 
-                message = Message(line)
-                response = message.getResponse()
+                incoming = Incoming(line)
+                #response = incoming.getResponse()
 
-                if response is None:
-                    self.request.close()
-                    return
+                # if response is None:
+                #     self.request.close()
+                #     return
 
-                # Сохраняем только подтвержденные ответы ACK
-                if message.protocol_out is Protocol.ACK:
-                    self.server.event_store.store_event(message)
+                #log.info(vars(incoming))
+                self.server.event_store.store_event(incoming)
 
-                log.info("Response: " + response)
+                #log.info("Response: " + response)
 
-                self.request.sendall(response.encode('utf8'))
+                #self.request.sendall(response.encode('utf8'))
 
                 if not line:
                     break
