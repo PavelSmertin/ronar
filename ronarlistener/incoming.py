@@ -19,7 +19,7 @@ class Incoming():
 
         # Head
         # messagetype - 1 байт – Идентификатор заголовка 0х11 – сообщение 0x13 – ответ Поле messagetype 0 - сообщение, 1 - ответ
-        self.messagetype = 1 if msg[0:1] == b'\x13' else 0
+        self.messagetype = '1' if msg[0:1] == b'\x13' else '0'
         # datachannel - 1 байт – не расшифровывая лупишь туда весь байт, как есть (нолики, единички) varchar(8)
         self.datachannel = "{0:08b}".format(int(msg[1:2], 16))
         # sizebytes int
@@ -39,12 +39,13 @@ class Incoming():
         # self.__logHex(msg[30:32])
 
         # datetime DATETIME
-        self.datetime = '20'+msg[37:38].hex()+'-'+msg[36:37].hex()+'-'+msg[35:36].hex()+' '+msg[32:33].hex()+':'+msg[33:34].hex()+':'+msg[34:35].hex()
+        self.datetime = '20'+msg[37:38].hex()+'-'+msg[35:36].hex()+'-'+msg[36:37].hex()+' '+msg[32:33].hex()+':'+msg[33:34].hex()+':'+msg[34:35].hex()
 
 
         # Data text
         self.data = msg[38:-4].hex()
-
+        #log.info('message')
+        #log.info(msg[38:-4].hex())
 
 
         # # CRCAES
