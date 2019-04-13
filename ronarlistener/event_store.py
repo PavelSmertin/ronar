@@ -8,11 +8,6 @@ import pymysql.cursors
 #from sshtunnel import SSHTunnelForwarder
 
 
-
-
-
-
-
 class EventStore():
 
     def __init__(self):
@@ -42,7 +37,7 @@ class EventStore():
           with connection.cursor() as cursor:
               # Create a new record
               sql = "INSERT INTO `commandsincoming` (`messagetype`, `datachannel`, `sizebytes`, `messageid`, `device_iddevice`, `datetime`, `data`) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-              #cursor.execute(sql, (message.messagetype, message.datachannel, message.sizebytes, message.messageid, message.device_iddevice, message.datetime, message.data))
+              cursor.execute(sql, (message.messagetype, message.datachannel, message.sizebytes, message.messageid, message.device_iddevice, message.datetime, message.data))
 
           #print('store_event')
           #print(message.data)
