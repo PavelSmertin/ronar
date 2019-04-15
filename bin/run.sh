@@ -5,10 +5,6 @@ echo ""
 
 BASE_DIR=`dirname $0`
 
-echo BASE_DIR
-
-(cd ${BASE_DIR}/../ && python -m ronarlistener >/dev/null 2>&1)
-
-echo "BASE_DIR"
+(cd ${BASE_DIR}/../ && python3 -m ronarlistener >/dev/null 2>&1)
 
 exit 0
