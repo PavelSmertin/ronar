@@ -21,7 +21,7 @@ class Incoming():
         # messagetype - 1 байт – Идентификатор заголовка 0х11 – сообщение 0x13 – ответ Поле messagetype 0 - сообщение, 1 - ответ
         self.messagetype = '1' if msg[0:1] == b'\x13' else '0'
         # datachannel - 1 байт – не расшифровывая лупишь туда весь байт, как есть (нолики, единички) varchar(8)
-        self.datachannel = "{0:08b}".format(int(msg[1:2], 16))
+        self.datachannel = "{0:08b}".format(int(msg[1:2].hex(), 16))
         # sizebytes int
         self.sizebytes = int.from_bytes(msg[2:4], byteorder='little')
         # CRCHEAD 2 байта – Пропускаешь
