@@ -54,17 +54,9 @@ class Incoming():
         # # CRC-16
         # self.__logHex(msg[-2:])
 
-        #11513a00 - заголовок
-        #eeb3 - CRCHEAD
-        #111100000000123456789abcdef0123456789abcdef00000 - Поле идентификаторов 24 байта
-        #2400 - команда
-        #130031022019 - тайм-слот
-        #3b0e6400310100000000000000000000 - опция 59
-        #7f00 - Завершающая опция
-        #00000000
-        #a64f - CRCAES
-        #9099 - CRC-16
 
+        # fullquery
+        self.fullquery = msg.hex()
 
 
     def getResponse(self):

@@ -36,8 +36,8 @@ class EventStore():
         try:
           with connection.cursor() as cursor:
               # Create a new record
-              sql = "INSERT INTO `commandsincoming` (`messagetype`, `datachannel`, `sizebytes`, `messageid`, `device_iddevice`, `commands`, `datetime`, `data`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-              cursor.execute(sql, (message.messagetype, message.datachannel, message.sizebytes, message.messageid, message.device_iddevice, message.command, message.datetime, message.data))
+              sql = "INSERT INTO `commandsincoming` (`messagetype`, `datachannel`, `sizebytes`, `messageid`, `device_iddevice`, `commands`, `datetime`, `data`, `fullquery`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+              cursor.execute(sql, (message.messagetype, message.datachannel, message.sizebytes, message.messageid, message.device_iddevice, message.command, message.datetime, message.data, message.fullquery))
 
           #print('store_event')
           #print(message.data)
