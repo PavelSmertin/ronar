@@ -39,7 +39,7 @@ class AlarmNotificationHandler(socketserver.StreamRequestHandler):
                 #     return
 
                 #log.info('AlarmNotificationHandler')
-                #log.info(vars(incoming))
+                log.info(vars(incoming))
                 self.server.event_store.store_event(incoming)
 
                 #log.info("Response: " + response)
