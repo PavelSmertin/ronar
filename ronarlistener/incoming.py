@@ -35,8 +35,8 @@ class Incoming():
         # device_iddevice int (значение всегда 1)
         self.device_iddevice = 1 # int.from_bytes(msg[8:12], byteorder='little')
 
-        # # Command
-        # self.__logHex(msg[30:32])
+        # Command
+        self.command = msg[30:32].hex()
 
         # datetime DATETIME
         self.datetime = '20'+msg[37:38].hex()+'-'+msg[35:36].hex()+'-'+msg[36:37].hex()+' '+msg[32:33].hex()+':'+msg[33:34].hex()+':'+msg[34:35].hex()
