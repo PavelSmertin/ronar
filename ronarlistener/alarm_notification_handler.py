@@ -22,7 +22,7 @@ class AlarmNotificationHandler(socketserver.StreamRequestHandler):
 
     def handle(self):
 
-
+        log.info('AlarmNotificationHandler')
         #self.request.sendall(b"test")
         #amqp_url = 'amqp://localhost:5672/%2F'
         #consumer = RabbitConsumer(amqp_url)
