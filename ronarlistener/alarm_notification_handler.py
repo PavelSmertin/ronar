@@ -22,7 +22,7 @@ class AlarmNotificationHandler(socketserver.StreamRequestHandler):
 
     def handle(self):
 
-        log.info('AlarmNotificationHandler')
+        log.info(self.request.recv(1024).hex())
         #self.request.sendall(b"test")
         #amqp_url = 'amqp://localhost:5672/%2F'
         #consumer = RabbitConsumer(amqp_url)
@@ -31,9 +31,6 @@ class AlarmNotificationHandler(socketserver.StreamRequestHandler):
         try: 
             while True:
                 line = self.request.recv(1024)
-
-                log.info(line.hex())
-
                 incoming = Incoming(line)
                 #response = incoming.getResponse()
 
