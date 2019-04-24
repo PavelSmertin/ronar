@@ -30,22 +30,8 @@ class AlarmNotificationHandler(socketserver.StreamRequestHandler):
         try: 
             while True:
                 line = self.request.recv(1024)
-
                 incoming = Incoming(line)
-                #response = incoming.getResponse()
-
-                # if response is None:
-                #     self.request.close()
-                #     return
-
-                #log.info('AlarmNotificationHandler')
-                log.info(vars(incoming))
                 self.server.event_store.store_event(incoming)
-
-                #log.info("Response: " + response)
-
-                #self.request.sendall(response.encode('utf8'))
-
                 if not line:
                     break
 

@@ -1,12 +1,12 @@
 __author__ = 'Pashtet <pashtetbezd@gmail.com>'
 
-
+import logging
 from datetime import datetime
 #from sqlalchemy import create_engine, MetaData, Column, Table, Integer, String, DateTime, select, desc
 
 import pymysql.cursors
 #from sshtunnel import SSHTunnelForwarder
-
+log = logging.getLogger(__name__)
 
 class EventStore():
 
@@ -51,6 +51,8 @@ class EventStore():
           #     cursor.execute(sql, ('message.messageid',))
           #     result = cursor.fetchone()
           #     print(result)
+        except pymysql.Error as e:
+          log.warn('Got error mysql {}'.format(e.args[0]), exc_info=error)
         finally:
           connection.close()
 
