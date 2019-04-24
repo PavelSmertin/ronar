@@ -11,30 +11,31 @@ log = logging.getLogger(__name__)
 class EventStore():
 
     def __init__(self):
-      print('__init__')
+      log.info('mysql init')
+      try:
+        self.connection = pymysql.connect(host='127.0.0.1',
+                              port=3306,
+                              user='root',
+                              password='@kunamatat@',
+                              db='signal',
+                              charset='utf8mb4',
+                              cursorclass=pymysql.cursors.DictCursor)
+      except pymysql.Error as e:
+        log.warn('Got error mysql {}'.format(e.args[0]), exc_info=error)
+
+
 
     def close(self):
-      print('close')
+      log.info('mysql close')
+      connection.close()
 
     def store_event(self, message):
 
-
-      # with SSHTunnelForwarder(
-      #   ('78.46.193.86', 22),
-      #   ssh_username='root',
-      #   ssh_password='akunamatata',
-      #   remote_bind_address=('127.0.0.1', 3306),
-      # ) as tunnel:
-        connection = pymysql.connect(host='127.0.0.1',
-                            port=3306,
-                            user='root',
-                            password='@kunamatat@',
-                            db='signal',
-                            charset='utf8mb4',
-                            cursorclass=pymysql.cursors.DictCursor)
+        if self.connection is None:
+          return
 
         try:
-          with connection.cursor() as cursor:
+          with self.connection.cursor() as cursor:
               # Create a new record
               sql = "INSERT INTO `commandsincoming` (`messagetype`, `datachannel`, `sizebytes`, `messageid`, `device_iddevice`, `commands`, `datetime`, `data`, `fullquery`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
               cursor.execute(sql, (message.messagetype, message.datachannel, message.sizebytes, message.messageid, message.device_iddevice, message.command, message.datetime, message.data, message.fullquery))
@@ -43,7 +44,7 @@ class EventStore():
           #print(message.data)
           # connection is not autocommit by default. So you must commit to save
           # your changes.
-          connection.commit()
+          self.connection.commit()
 
           # with connection.cursor() as cursor:
           #     # Read a single record
@@ -53,7 +54,9 @@ class EventStore():
           #     print(result)
         except pymysql.Error as e:
           log.warn('Got error mysql {}'.format(e.args[0]), exc_info=error)
-        finally:
-          connection.close()
+        except
+          log.warn("Unexpected error:", sys.exc_info()[0])
+          raise
+
 
 
