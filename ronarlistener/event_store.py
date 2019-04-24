@@ -54,7 +54,7 @@ class EventStore():
           #     print(result)
         except pymysql.Error as e:
           log.warn('Got error mysql {}'.format(e.args[0]), exc_info=error)
-        except
+        except:
           log.warn("Unexpected error:", sys.exc_info()[0])
           raise
 
