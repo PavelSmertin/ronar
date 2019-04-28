@@ -31,8 +31,10 @@ class EventStore():
 
     def store_event(self, message):
 
-        if self.connection is None:
-          return
+        return
+
+        # if self.connection is None:
+        #   return
 
         # try:
         #   with self.connection.cursor() as cursor:
