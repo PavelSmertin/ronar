@@ -12,22 +12,22 @@ class EventStore():
 
     def __init__(self):
       log.info('mysql init')
-      try:
-        self.connection = pymysql.connect(host='127.0.0.1',
-                              port=3306,
-                              user='root',
-                              password='@kunamatat@',
-                              db='signal',
-                              charset='utf8mb4',
-                              cursorclass=pymysql.cursors.DictCursor)
-      except pymysql.Error as e:
-        log.warn('Got error mysql {}'.format(e.args[0]), exc_info=error)
+      # try:
+      #   self.connection = pymysql.connect(host='127.0.0.1',
+      #                         port=3306,
+      #                         user='root',
+      #                         password='@kunamatat@',
+      #                         db='signal',
+      #                         charset='utf8mb4',
+      #                         cursorclass=pymysql.cursors.DictCursor)
+      # except pymysql.Error as e:
+      #   log.warn('Got error mysql {}'.format(e.args[0]), exc_info=error)
 
 
 
     def close(self):
       log.info('mysql close')
-      connection.close()
+      # connection.close()
 
     def store_event(self, message):
 
