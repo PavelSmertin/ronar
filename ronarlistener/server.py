@@ -50,21 +50,11 @@ def run():
     # Create the server, binding to HOST on PORT
     server = ThreadedTCPServer((HOST, PORT), AlarmNotificationHandler, event_store)
 
-    # Start a thread with the server -- that thread will then start one
-    # more thread for each request
+    # Start a thread with the server -- that thread will then start one more thread for each request
     server_thread = threading.Thread(target=server.serve_forever)
-    # Exit the server thread when the main thread terminates
-    server_thread.daemon = True
     server_thread.start()
     log.info('Server loop running in thread: %s', server_thread.name)
 
-    try:
-        while True:
-            time.sleep(60)
-    except KeyboardInterrupt:
-        log.info('Ctrl-c pressed, exiting ...')
-        server.shutdown()
-        event_store.close()
 
 
 # -----------------------------------------------------------------
