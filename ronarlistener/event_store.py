@@ -30,7 +30,7 @@ class EventStore():
       connection.close()
 
     def store_event(self, message):
-        log.info(message.datetime)
+        # log.info(message.datetime)
         return
 
         if self.connection is None:
