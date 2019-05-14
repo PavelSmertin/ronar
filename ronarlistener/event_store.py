@@ -27,7 +27,7 @@ class EventStore():
 
     def close(self):
       log.info('mysql close')
-      connection.close()
+      # connection.close()
 
     def store_event(self, message):
         # log.info(message.datetime)

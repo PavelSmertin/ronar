@@ -9,7 +9,7 @@ from ronarlistener.alarm_notification_handler import AlarmNotificationHandler
 from ronarlistener.event_store import EventStore
 
 log = logging.getLogger(__name__)
-HOST, PORT = '', 32002
+HOST, PORT = '', 32001
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
