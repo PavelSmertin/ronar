@@ -71,8 +71,6 @@ class Incoming():
 
     def getResponseHead(self, is_command = False):
 
-        #11 61 3a 00 2b 16 11 11 00 00 00 00 12 34 56 78 9a bc de f0 12 34 56 78 9a bc de f0 00 00 24 00 13 01 15 02 20 19 3b 0e 64 00 31 01 00 00 00 00 00 00 00 00 00 00 7f 00 00 00 00 00 ec 5b 90 99
-
         messagetype = b'\x10' if is_command else b'\x12'
         
         # datachannel - 1 байт – не расшифровывая лупишь туда весь байт, как есть (нолики, единички) varchar(8)
@@ -128,7 +126,8 @@ class Incoming():
 
 
     def __calcCRC(self, msg):
-        crc16 = crcmod.mkCrcFun(0x1021, rev=False, initCrc=0x0000, xorOut=0x0000)
+        crc16 = crcmod.mkCrcFun(0x11021, rev=False, initCrc=0x0000, xorOut=0x0000)
+
         return crc16(msg).to_bytes(2, byteorder='big')
 
 
