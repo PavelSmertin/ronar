@@ -9,7 +9,7 @@ async def tcp_echo_client(message, loop):
 
     while True:
         data = await reader.read(1024)
-        print('Received: %r' % data.decode())
+        print('Received: %r' % data)
         if not data:
             break  # EOF
     

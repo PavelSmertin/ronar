@@ -12,6 +12,8 @@ LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
               '-35s %(lineno) -5d: %(message)s')
 LOGGER = logging.getLogger(__name__)
 
+logging.getLogger("pika").setLevel(logging.WARNING)
+
 
 class RabbitConsumer(object):
     """This is an example consumer that will handle unexpected interactions
@@ -315,6 +317,9 @@ class RabbitConsumer(object):
         :param bytes body: The message body
 
         """
+
+        self.pass_message()
+
         LOGGER.info('Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, body)
         self.acknowledge_message(basic_deliver.delivery_tag)
@@ -364,13 +369,14 @@ class RabbitConsumer(object):
         LOGGER.info('Closing the channel')
         self._channel.close()
 
-    def run(self):
+    def run(self, pass_message):
         """Run the example consumer by connecting to RabbitMQ and then
         starting the IOLoop to block and allow the AsyncioConnection to operate.
 
         """
+
+        self.pass_message = pass_message
         self._connection = self.connect()
-        self._connection.ioloop.run_forever()
 
     def stop(self):
         """Cleanly shutdown the connection to RabbitMQ by stopping the consumer

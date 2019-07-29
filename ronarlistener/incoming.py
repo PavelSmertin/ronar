@@ -2,9 +2,9 @@
 __author__ = 'Pashtet <pashtetbezd@gmail.com>'
 
 
-from datetime import datetime
-import time
+
 from enum import Enum
+import crcmod
 
 import logging
 log = logging.getLogger(__name__)
@@ -31,11 +31,13 @@ class Incoming():
         # Identities Поле идентификаторов 24 байта (передается в открытом виде)
         #self.__logHex(msg[6:30])
         # messageid int
+        self.messageidByte = msg[6:8]
         self.messageid = int.from_bytes(msg[6:8], byteorder='little')
         # device_iddevice int (значение всегда 1)
         self.device_iddevice = 1 # int.from_bytes(msg[8:12], byteorder='little')
 
         # Command
+        self.commandByte = msg[30:32]
         self.command = msg[30:32].hex()
 
         # datetime DATETIME
@@ -44,8 +46,8 @@ class Incoming():
 
         # Data text
         self.data = msg[38:-4].hex()
-        #log.info('message')
-        #log.info(msg[38:-4].hex())
+
+        # msg[38:-4].hex()
 
 
         # # CRCAES
@@ -54,65 +56,73 @@ class Incoming():
         # # CRC-16
         # self.__logHex(msg[-2:])
 
-
         # fullquery
         self.fullquery = msg.hex()
 
 
     def getResponse(self):
+        return self.getResponseHead()
 
-        # if self.protocol_out is Protocol.DIS:
-        #     return
+    def getResponseHead(self):
 
-        # formatter = '"{}"{}{}{}{}[]_{}'
+        messagetype = b'\x12'
         
-        # timestamp = datetime.fromtimestamp(time.time()).strftime('%H:%M:%S,%m-%d-%Y')
-        # response = formatter.format(self.protocol_out.name, self.seq, self.rrcvr, self.lpref, self.acct, timestamp)
+        # datachannel - 1 байт – не расшифровывая лупишь туда весь байт, как есть (нолики, единички) varchar(8)
+        datachannel = b'\x00'
+        
+        #  sizebytes 
+        body = self.getResponseBody()
+        sizebytes = len(body).to_bytes(2, byteorder='little')
 
-        # header = ('%04x' % len(response)).upper()
+        log.info('sizebytes:')
+        log.info(len(body))
+        
+        # crcHead
+        head = messagetype + datachannel + sizebytes
 
-        # CRC = self.__calcCRC(response)
-        # response="\n" + CRC + header + response + "\r"
-        return #response
+        crcHead = self.__calcCRC(head)
 
-    def __checkTimestamp(self):
-        currentTime = datetime.fromtimestamp(time.time())
-        messageTime = datetime.strptime(self.msg_timestamp, "%H:%M:%S,%m-%d-%Y")
-        return abs((currentTime - messageTime).total_seconds()) < TIME_INTERVAL
+        log.info('response:')
+        self.__logHex(head + crcHead + body)
+
+        return head + crcHead + body
+
+    def getResponseIdent(self):
+        # messageid int
+        messageid = self.messageidByte
+
+        log.info('messageid:')
+        self.__logHex(messageid)
+
+        # 8 байт – IMEI устройства управления
+        imei = b'\x00\x00\x00\x00\x00\x00\x00\x00'
+        # 2 байта – Номер пользователя, если =0, то отсутствует
+        userid = b'\x00\x00'
+        # 2 байта – Случайное число – используется для выбора ключа шифрования. Если =0, то сообщение не зашифровано.
+        key = b'\x00\x00'
+                
+
+        log.info('ident(14):')
+        self.__logHex(messageid + imei + userid + key)
+        return messageid + imei + userid + key
+
+    def getResponseData(self):
+        ### Data text ###
+        data = self.commandByte + b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+        log.info('data(16):')
+        self.__logHex(data)
+        return data
+
+    def getResponseBody(self):
+        body = self.getResponseIdent() + self.getResponseData()
+        bodyCRC = self.__calcCRC(body)
+        return body + bodyCRC
+
 
     def __calcCRC(self, msg):
-        CRC=0
-        for letter in msg:
+        crc16 = crcmod.mkCrcFun(0x18005, rev=False, initCrc=0xFFFF, xorOut=0x0000)
+        return crc16(msg).to_bytes(2, byteorder='big')
 
-            temp=ord(letter)
-            #log.info('letter: {}, temp: {}'.format(letter, temp))
-
-            for j in range(0,8):  # @UnusedVariable
-                #log.info('j: {}'.format(j))
-
-                temp ^= CRC & 1
-                #log.info('xor temp: {}, and CRC: {}'.format(temp, CRC))
-
-                CRC >>= 1
-                #log.info('shift CRC: {}'.format(CRC))
-
-                if (temp & 1) != 0:
-                    CRC ^= 0xA001
-                    #log.info('and temp: {}, xor polinom CRC: {}'.format(temp, CRC))
-
-                #log.info('and temp: {}'.format(temp))
-                temp >>= 1
-                #log.info('shift temp: {}'.format(temp))
-                
-        return ('%x' % CRC).upper().zfill(4)
-
-    def __encrypt(self, message):
-        cipher = Blowfish.new(Config.get('encrypt_passphrase'), Blowfish.MODE_CBC, Config.get('encrypt_iv'))
-        pad = 8-(len(message)%8)
-        for x in range(pad):  # @UnusedVariable
-            message+=" "
-        encrypted = cipher.encrypt(message)
-        return base64.urlsafe_b64encode(encrypted)
 
     def __logHex(self, msg):
         log.info( " ".join(["{:02x}".format(x).upper() for x in msg]))
