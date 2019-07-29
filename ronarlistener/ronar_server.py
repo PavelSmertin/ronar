@@ -37,6 +37,9 @@ class RonarServer(object):
         logging.info('Socket started')
         while True:
             data = await reader.read(1024)
+            if not data:
+                break  # EOF
+                
             message = data
             addr = writer.get_extra_info('peername')
             print("Request %r from %r" % ("", addr))            
@@ -44,19 +47,20 @@ class RonarServer(object):
 
             incoming = Incoming(message)
 
+            if incoming.is_command_response():
+                continue
+
             writer.write(incoming.getResponse())
             await writer.drain()
-            if not data:
-                break  # EOF
 
 
 
-    def on_message(self):
-        message = "Команда"
-        logging.info('handle_queue started')
+
+    def on_message(self, message):
+        logging.info('on_message')
 
         if self._writer:
-            self._writer.write(message.encode())
+            self._writer.write(message)
             self._writer.drain()
 
 if __name__ == '__main__':

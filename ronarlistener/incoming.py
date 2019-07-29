@@ -15,7 +15,10 @@ TIME_INTERVAL = 40
 
 class Incoming():
 
-    def __init__(self, msg):
+    def __init__(self, msg = None):
+
+        if msg == None: 
+            return
 
         # Head
         # messagetype - 1 байт – Идентификатор заголовка 0х11 – сообщение 0x13 – ответ Поле messagetype 0 - сообщение, 1 - ответ
@@ -60,18 +63,23 @@ class Incoming():
         self.fullquery = msg.hex()
 
 
+    def is_command_response(self):
+        return self.messagetype == '1'
+
     def getResponse(self):
         return self.getResponseHead()
 
-    def getResponseHead(self):
+    def getResponseHead(self, is_command = False):
 
-        messagetype = b'\x12'
+        #11 61 3a 00 2b 16 11 11 00 00 00 00 12 34 56 78 9a bc de f0 12 34 56 78 9a bc de f0 00 00 24 00 13 01 15 02 20 19 3b 0e 64 00 31 01 00 00 00 00 00 00 00 00 00 00 7f 00 00 00 00 00 ec 5b 90 99
+
+        messagetype = b'\x10' if is_command else b'\x12'
         
         # datachannel - 1 байт – не расшифровывая лупишь туда весь байт, как есть (нолики, единички) varchar(8)
-        datachannel = b'\x00'
+        datachannel = b'\x02' if is_command else b'\x00'
         
         #  sizebytes 
-        body = self.getResponseBody()
+        body = self.getResponseBody(is_command)
         sizebytes = len(body).to_bytes(2, byteorder='little')
 
         log.info('sizebytes:')
@@ -87,9 +95,9 @@ class Incoming():
 
         return head + crcHead + body
 
-    def getResponseIdent(self):
+    def getResponseIdent(self, is_command = False):
         # messageid int
-        messageid = self.messageidByte
+        messageid = b'\x00\x00' if is_command else self.messageidByte
 
         log.info('messageid:')
         self.__logHex(messageid)
@@ -106,21 +114,21 @@ class Incoming():
         self.__logHex(messageid + imei + userid + key)
         return messageid + imei + userid + key
 
-    def getResponseData(self):
+    def getResponseData(self, is_command = False):
         ### Data text ###
-        data = self.commandByte + b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+        data =  b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' if is_command else self.commandByte + b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
         log.info('data(16):')
         self.__logHex(data)
         return data
 
-    def getResponseBody(self):
-        body = self.getResponseIdent() + self.getResponseData()
+    def getResponseBody(self, is_command = False):
+        body = self.getResponseIdent(is_command) + self.getResponseData(is_command)
         bodyCRC = self.__calcCRC(body)
         return body + bodyCRC
 
 
     def __calcCRC(self, msg):
-        crc16 = crcmod.mkCrcFun(0x18005, rev=False, initCrc=0xFFFF, xorOut=0x0000)
+        crc16 = crcmod.mkCrcFun(0x1021, rev=False, initCrc=0x0000, xorOut=0x0000)
         return crc16(msg).to_bytes(2, byteorder='big')
 
 
