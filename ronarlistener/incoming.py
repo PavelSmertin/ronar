@@ -11,8 +11,6 @@ log = logging.getLogger(__name__)
 
 TIME_INTERVAL = 40
 
-# echo $'\n'E98D0071\"RO-TEM\"0046L0#355911044259579[1210 02 0000014B 1E]_00:30:10,01-01-2018$'\r' | nc localhost 32002
-
 class Incoming():
 
     def __init__(self, msg = None):

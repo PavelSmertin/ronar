@@ -1,2 +1,3 @@
 # General dependencies
-sqlalchemy
+pika
+crcmod
