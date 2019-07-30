@@ -1,11 +1,5 @@
 import pika
 
-from incoming import Incoming
-
-import logging
-log = logging.getLogger(__name__)
-
-
 def __logHex(msg):
         return " ".join(["{:02x}".format(x).upper() for x in msg])
 
@@ -14,9 +8,7 @@ channel = connection.channel()
 
 channel.queue_declare(queue='text')
 
-incoming = Incoming()
-
-message = incoming.getResponseHead(True)
+message = b'\x24\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
 channel.basic_publish(
 	exchange='', 

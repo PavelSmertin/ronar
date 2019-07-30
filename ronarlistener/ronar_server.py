@@ -1,10 +1,10 @@
 import asyncio
 import logging
+import redis
 
 from rabbit_consumer import RabbitConsumer
 
 from incoming import Incoming
-
 
 class RonarServer(object):
     
@@ -12,6 +12,7 @@ class RonarServer(object):
         self._loop = loop or asyncio.get_event_loop() 
         self._server = asyncio.start_server(self.handle_connection, host=host, port=port)
         self._writer = None
+        self._store = redis.Redis(host='localhost', port=6379)
 
     
     def start(self, and_loop=True):
@@ -42,26 +43,43 @@ class RonarServer(object):
                 
             message = data
             addr = writer.get_extra_info('peername')
-            print("Request %r from %r" % ("", addr))            
-            print("Response sent: %r" % message)
 
+            print("Incoming %r from %r" % ("", addr))            
             incoming = Incoming(message)
 
-            if incoming.is_command_response():
+            if incoming.is_response():
+                self._store.hset("out", b'\xFF' + incoming.get_message_id(), message)
                 continue
+            else:
+                self._store.hset("in", b'\x00' + incoming.get_message_id(), message)
 
-            writer.write(incoming.getResponse())
+
+            print("Response sent: %r" % message)
+            writer.write(incoming.get_response())
             await writer.drain()
+            self._store.hset("in", b'\xFF' + incoming.get_message_id(), incoming.get_response())
 
 
-
-
-    def on_message(self, message):
+    def on_message(self, message, tag):
         logging.info('on_message')
 
+        incoming = Incoming()
+        message_id = incoming.get_id_from_tag(tag)
+        command = incoming.get_response_from(
+            message_id = message_id, 
+            message_type = b'\x10', 
+            command = b'\x24\x00', 
+            options = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            )
+
+        print(command)
+
+
         if self._writer:
-            self._writer.write(message)
+            self._writer.write(command)
             self._writer.drain()
+            self._store.hset("out", b'\x00' + message_id, command)
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

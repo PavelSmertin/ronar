@@ -318,7 +318,7 @@ class RabbitConsumer(object):
 
         """
 
-        self.pass_message(body)
+        self.pass_message(body, basic_deliver.delivery_tag)
 
         LOGGER.info('Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, body)
