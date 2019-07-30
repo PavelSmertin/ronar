@@ -68,12 +68,9 @@ class RonarServer(object):
         command = incoming.get_response_from(
             message_id = message_id, 
             message_type = b'\x10', 
-            command = b'\x24\x00', 
-            options = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+            command = message[0:2], 
+            options = message[2:]
             )
-
-        print(command)
-
 
         if self._writer:
             self._writer.write(command)

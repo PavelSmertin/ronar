@@ -77,9 +77,6 @@ class Incoming():
         head_crc = transport + self.__calcCRC(transport)
 
         return Head(
-            message_type    = message_type,
-            channel         = channel,
-            body_size       = body_size,
             head_crc        = head_crc,
             body_crc        = body_crc
             )
@@ -93,15 +90,12 @@ class Incoming():
 
 
 class Head():
-    def __init__(self, message_type, channel, body_size, head_crc, body_crc):
-        self._message_type  = message_type
-        self._channel       = channel
-        self._body_size     = body_size
+    def __init__(self, head_crc, body_crc):
         self._head_crc      = head_crc
         self._body_crc      = body_crc
 
     def get_message(self):
-        return self._message_type + self._channel + self._body_size + self._head_crc
+        return self._head_crc
 
     def get_body_crc(self):
         return self._body_crc
