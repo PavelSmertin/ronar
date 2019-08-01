@@ -12,7 +12,7 @@ class RonarServer(object):
         self._loop = loop or asyncio.get_event_loop() 
         self._server = asyncio.start_server(self.handle_connection, host=host, port=port)
         self._writer = None
-        self._store = redis.Redis(host='localhost', port=6379)
+        self._store = redis.Redis(host='redis', port=6379)
 
     
     def start(self, and_loop=True):
@@ -23,7 +23,7 @@ class RonarServer(object):
             self._loop.run_forever()
 
     def run_consumer(self):
-        amqp_url = 'amqp://localhost:5672/%2F'
+        amqp_url = 'amqp://rabbit:5672/%2F'
         consumer = RabbitConsumer(amqp_url)
         consumer.run(self.on_message)
 
