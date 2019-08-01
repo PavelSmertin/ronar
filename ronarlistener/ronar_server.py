@@ -49,15 +49,18 @@ class RonarServer(object):
 
             if incoming.is_response():
                 self._store.hset("out", b'\xFF' + incoming.get_message_id(), message)
+                self._store.publish('stream', incoming.get_message_id() + message)
                 continue
             else:
                 self._store.hset("in", b'\x00' + incoming.get_message_id(), message)
-
+                self._store.publish('stream', incoming.get_message_id() + message)
 
             print("Response sent: %r" % message)
             writer.write(incoming.get_response())
             await writer.drain()
             self._store.hset("in", b'\xFF' + incoming.get_message_id(), incoming.get_response())
+            self._store.publish('stream', incoming.get_message_id() + incoming.get_response())
+
 
 
     def on_message(self, message, tag):
@@ -76,6 +79,7 @@ class RonarServer(object):
             self._writer.write(command)
             self._writer.drain()
             self._store.hset("out", b'\x00' + message_id, command)
+            self._store.publish('stream', message_id + command)
 
 
 if __name__ == '__main__':

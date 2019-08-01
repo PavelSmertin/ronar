@@ -31,7 +31,7 @@ async def request_queue(writer, message):
 def __logHex(msg):
         return " ".join(["{:02x}".format(x).upper() for x in msg])
 
-message = bytes.fromhex('11 61 3a 00 2b 16 11 11 00 00 00 00 12 34 56 78 9a bc de f0 12 34 56 78 9a bc de f0 00 00 24 00 13 01 15 02 20 19 3b 0e 64 00 31 01 00 00 00 00 00 00 00 00 00 00 7f 00 00 00 00 00 ec 5b 90 99')
+message = bytes.fromhex('11 61 3a 00 2b 16 11 11 00 00 00 00 12 34 56 78 9a bc de f0 12 34 56 78 9a bc de f0 00 00 24 FF 13 01 15 02 20 19 3b 0e 64 00 31 01 00 00 00 00 00 00 00 00 00 00 7f 00 00 00 00 00 ec 5b 90 99')
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(tcp_echo_client(message, loop))
