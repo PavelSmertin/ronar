@@ -23,7 +23,7 @@ class RonarServer(object):
             self._loop.run_forever()
 
     def run_consumer(self):
-        amqp_url = 'amqp://0.0.0.0:5672/%2F'
+        amqp_url = 'amqp://guest:guest@rabbitmq:5672/%2F'
         consumer = RabbitConsumer(amqp_url)
         consumer.run(self.on_message)
 

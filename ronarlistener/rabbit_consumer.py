@@ -440,7 +440,7 @@ class ReconnectingRabbitConsumer(object):
 
 def main():
     logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
-    amqp_url = 'amqp://guest:guest@0.0.0.0:5672/%2F'
+    amqp_url = 'amqp://guest:guest@rabbitmq:5672/%2F'
     consumer = ReconnectingRabbitConsumer(amqp_url)
     consumer.run()
 
