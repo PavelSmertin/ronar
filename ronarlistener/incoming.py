@@ -10,11 +10,17 @@ class Incoming():
         if msg == None: 
             return
 
+        log.info("Imcoming message: ")
+        log.info(msg)
+        log.info("Channel: ")
+        log.info(msg[1:2])
+
+
         self._msg = msg
 
         # Head - 6 байт
         self._message_type = msg[0:1]
-        self._channel = "{0:08b}".format(int(msg[1:2].hex(), 16))
+        #self._channel = "{0:08b}".format(int(msg[1:2].hex(), 16))
         self._size = int.from_bytes(msg[2:4], byteorder='little')
         self._crc_head = msg[4:6]
 
