@@ -1,5 +1,6 @@
 import crcmod
 import logging
+import datetime
 
 log = logging.getLogger(__name__)
 
@@ -7,8 +8,30 @@ log = logging.getLogger(__name__)
 class Incoming():
 
     def __init__(self, msg = None):
+
+        self._is_valid = False
+
         if msg == None: 
+            log.info("was None")
             return
+
+        if msg == 'S':
+            log.info("was S")
+            return
+
+        if msg == b'\x53':
+            log.info("was 0x53")
+            return
+
+        if len(msg) < 16: 
+            log.info("was shorter 16")
+            return
+
+        if not isinstance(msg, bytes):
+            log.info("was not bytes")
+            return
+
+        self._is_valid = True
 
         log.info("Imcoming message: ")
         log.info(msg)
@@ -20,7 +43,7 @@ class Incoming():
 
         # Head - 6 байт
         self._message_type = msg[0:1]
-        #self._channel = "{0:08b}".format(int(msg[1:2].hex(), 16))
+        self._channel = "{0:08b}".format(int(msg[1:2].hex(), 16))
         self._size = int.from_bytes(msg[2:4], byteorder='little')
         self._crc_head = msg[4:6]
 
@@ -35,8 +58,8 @@ class Incoming():
         self._crc_aes = msg[-4:-2]
         self._crc16 = msg[-2:]
 
-    def validate(self):
-        return True
+    def is_valid(self):
+        return self._is_valid
 
     def get_message_id(self):
         return self._message_id
@@ -122,4 +145,10 @@ class Data():
         self._options       = options
 
     def get_message(self):
-        return self._command + self._options
+        return self._command + self.__fill_data(options)
+
+    def __fill_data(self, options):
+        current_time        = datetime.date.now()
+        current_time_str    = current_time.strftime("%H %M %S %m %d %y")
+        current_time_bytes  = bytes.fromhex(current_time_str)
+        return current_time_bytes + b'\x00\x00\x00\x00\x00\x00\x00\x00'

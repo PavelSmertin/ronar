@@ -44,8 +44,12 @@ class RonarServer(object):
             message = data
             addr = writer.get_extra_info('peername')
 
-            print("Incoming %r from %r" % ("", addr))            
+            logging.info("Incoming %r from %r" % ("", addr))
             incoming = Incoming(message)
+
+            if not incoming.is_valid():
+                logging.info("is not valid")
+                continue
 
             if incoming.is_response():
                 self._store.hset("out", b'\xFF' + incoming.get_message_id(), message)
@@ -55,7 +59,7 @@ class RonarServer(object):
                 self._store.hset("in", b'\x00' + incoming.get_message_id(), message)
                 self._store.publish('stream', incoming.get_message_id() + message)
 
-            print("Response sent: %r" % message)
+            logging.info("Response sent: %r" % message)
             writer.write(incoming.get_response())
             await writer.drain()
             self._store.hset("in", b'\xFF' + incoming.get_message_id(), incoming.get_response())
