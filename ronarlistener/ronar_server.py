@@ -34,6 +34,7 @@ class RonarServer(object):
         print('server closed')
      
     async def handle_connection(self, reader, writer):
+        self._store.publish('events', 'status:connected')
         self._writer = writer
         logging.info('Socket started')
         while True:
@@ -59,11 +60,17 @@ class RonarServer(object):
                 self._store.hset("in", b'\x00' + incoming.get_message_id(), message)
                 self._store.publish('stream', incoming.get_message_id() + message)
 
+            if incoming.get_event():
+                self._store.publish('events', "status:%r" % incoming.get_event())
+
+
             logging.info("Response sent: %r" % message)
             writer.write(incoming.get_response())
             await writer.drain()
             self._store.hset("in", b'\xFF' + incoming.get_message_id(), incoming.get_response())
             self._store.publish('stream', incoming.get_message_id() + incoming.get_response())
+
+        self._store.publish('events', 'status:disconnected')
 
 
 
