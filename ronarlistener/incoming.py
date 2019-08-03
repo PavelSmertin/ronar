@@ -145,10 +145,10 @@ class Data():
         self._options       = options
 
     def get_message(self):
-        return self._command + self.__fill_data(options)
+        return self._command + self.__fill_data()
 
-    def __fill_data(self, options):
-        current_time        = datetime.date.now()
+    def __fill_data(self):
+        current_time        = datetime.datetime.now()
         current_time_str    = current_time.strftime("%H %M %S %m %d %y")
         current_time_bytes  = bytes.fromhex(current_time_str)
         return current_time_bytes + b'\x00\x00\x00\x00\x00\x00\x00\x00'
