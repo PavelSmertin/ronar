@@ -37,7 +37,7 @@ class RonarServer(object):
         self._store.publish('events', 'status:connected')
         self._writer = writer
 
-        sock = transport.get_extra_info('socket')
+        sock = writer.get_extra_info('socket')
 
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 1)
