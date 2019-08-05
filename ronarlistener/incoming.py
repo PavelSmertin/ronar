@@ -71,7 +71,7 @@ class Incoming():
         return self._message_type == b'\x13'
 
     def get_event(self):
-        return False if self._command[0:1] == b'\x24' else " ".join(["{:02x}".format(x).upper() for x in self._command])
+        return " ".join(["{:02x}".format(x).upper() for x in self._command + self._data])
 
     def get_response(self):
         return self.get_response_from(
