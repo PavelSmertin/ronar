@@ -5,6 +5,7 @@ import redis
 from rabbit_consumer import RabbitConsumer
 
 from incoming import Incoming
+import socket
 
 class RonarServer(object):
     
